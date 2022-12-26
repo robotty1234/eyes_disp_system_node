@@ -7,14 +7,23 @@ from eyes_msgs.msg import Eyes
 class EyeInfoSubscriber(Node):
     
 
-    def __init__(self, topic_name, port_name, bps_speed, debug_disp, board = True):
+    def __init__(self, debug_disp, board):
         super().__init__('eyes_disp_system_node')
-        self.subscription = self.create_subscription(Eyes, topic_name, self.listener_callback, 10)
+        self.declare_parameter('port_name','/dev/ttyACM0')
+        self.declare_parameter('bps_speed', 9600)
+        #Read parameters 
+        self.port_name = self.get_parameter('port_name').get_parameter_value().string_value
+        self.bps_speed = self.get_parameter('bps_speed').get_parameter_value().integer_value
+        #Set init
+        self.subscription = self.create_subscription(Eyes, 'eye_info_topic', self.listener_callback, 10)
         self.board = board
+        self.disp = debug_disp
         if self.board == True:
             self.subscription
-            self.ser = SerialUART(port_name, bps_speed,  timeOut=None)
-        self.disp = debug_disp
+            self.ser = SerialUART(self.port_name, self.bps_speed,  timeOut=None, debaug=False)
+            self.get_logger().info('port = "%s"' % self.port_name)
+            self.get_logger().info('speed = "%s"' % self.bps_speed)
+        self.get_logger().info("Finish init")
 
     def listener_callback(self, msg):
         #Save the value of eyes_msgs
@@ -33,12 +42,15 @@ class EyeInfoSubscriber(Node):
             self.get_logger().info('eye_blink : "%d"' % self.eye_blink)
             self.get_logger().info("===========================")
         if self.board == True:
+            self.get_logger().info("Send Arduino board ...")
             #Send message contents saved in Arduino board
             self._SendScurely('eye_lid_l:' + str(self.eye_lid_l))
             self._SendScurely('eye_lid_r:' + str(self.eye_lid_r))
             self._SendScurely('eye_pupil_l:' + str(self.eye_pupil_l))
             self._SendScurely('eye_pupil_r:' + str(self.eye_pupil_r))
             self._SendScurely('eye_blink:' + str(self.eye_blink))
+            self._SendScurely('finish')
+            self.get_logger().info("Finished send Arduino board !!")
     
     def _SendScurely(self,dataString,times=None):
         success = False
@@ -63,7 +75,7 @@ class EyeInfoSubscriber(Node):
 def main(args=None):
     print('Hi from eyes_disp_system_node.')
     rclpy.init(args=args)
-    eyeSystem = EyeInfoSubscriber('eye_info_topic', '/dev/ttyACM0', 115200, True, False)
+    eyeSystem = EyeInfoSubscriber(debug_disp = True, board=True)
     rclpy.spin(eyeSystem)
     eyeSystem.pyserial_colse()
     rclpy.shutdown()
