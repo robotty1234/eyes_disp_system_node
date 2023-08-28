@@ -29,6 +29,8 @@ class EyeInfoSubscriber(Node):
         #Save the value of eyes_msgs
         self.eye_lid_l = msg.eye_lid_l
         self.eye_lid_r = msg.eye_lid_r
+        self.eye_lid_type_l = msg.eye_lid_type_l
+        self.eye_lid_type_r = msg.eye_lid_type_r
         self.eye_pupil_l = msg.eye_pupil_l
         self.eye_pupil_r = msg.eye_pupil_r
         self.eye_blink = msg.eye_blink
@@ -37,6 +39,8 @@ class EyeInfoSubscriber(Node):
             self.get_logger().info("===========================")
             self.get_logger().info('eye_lid_l : "%d"' % self.eye_lid_l)
             self.get_logger().info('eye_lid_r : "%d"' % self.eye_lid_r)
+            self.get_logger().info('eye_lid_type_l : "%d"' % self.eye_lid_type_l)
+            self.get_logger().info('eye_lid_type_r : "%d"' % self.eye_lid_type_r)
             self.get_logger().info('eye_pupil_l : "%d"' % self.eye_pupil_l)
             self.get_logger().info('eye_pupil_r : "%d"' % self.eye_pupil_r)
             self.get_logger().info('eye_blink : "%d"' % self.eye_blink)
@@ -46,6 +50,8 @@ class EyeInfoSubscriber(Node):
             #Send message contents saved in Arduino board
             self._SendScurely('eye_lid_l:' + str(self.eye_lid_l))
             self._SendScurely('eye_lid_r:' + str(self.eye_lid_r))
+            self._SendScurely('eye_lid_type_l:' + str(self.eye_lid_type_l))
+            self._SendScurely('eye_lid_type_r:' + str(self.eye_lid_type_r))
             self._SendScurely('eye_pupil_l:' + str(self.eye_pupil_l))
             self._SendScurely('eye_pupil_r:' + str(self.eye_pupil_r))
             self._SendScurely('eye_blink:' + str(self.eye_blink))
